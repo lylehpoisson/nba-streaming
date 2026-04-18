@@ -1,0 +1,38 @@
+version: 2
+
+sources:
+  - name: raw
+    database: NBA_DB
+    schema: RAW
+    tables:
+      - name: RAW_TEAM_GAME_LOGS
+        description: "Raw team game logs from nba_api LeagueGameLog endpoint"
+      - name: RAW_PLAYER_GAME_LOGS
+        description: "Raw player game logs from nba_api PlayerGameLogs endpoint"
+      - name: RAW_TEAMS
+        description: "Static team reference data from nba_api"
+
+models:
+  - name: stg_team_game_logs
+    description: "Cleaned and typed team game log data"
+    columns:
+      - name: game_id
+        description: "Unique game identifier"
+        tests:
+          - not_null
+      - name: team_id
+        tests:
+          - not_null
+      - name: is_win
+        tests:
+          - not_null
+
+  - name: stg_player_game_logs
+    description: "Cleaned and typed player game log data"
+    columns:
+      - name: game_id
+        tests:
+          - not_null
+      - name: player_id
+        tests:
+          - not_null

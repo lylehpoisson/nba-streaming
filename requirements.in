@@ -1,0 +1,7 @@
+nba_api                          # NBA stats data source
+snowflake-connector-python[pandas]  # Snowflake + write_pandas support
+python-dotenv                    # load credentials from .env
+dbt-snowflake                    # dbt adapter for Snowflake
+pip-tools                        # dependency management (compile this file with pip-compile)
+dotenv                           # read credentials
+click                            # CLI

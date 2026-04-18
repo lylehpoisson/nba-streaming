@@ -1,0 +1,14 @@
+load_to_snowflake.py
+- account and user shouldn't be hardcoded
+- something better than os.environ for password
+- make sholw SNOWFLAKE_CONFIG live outside honestly
+- make documentation a little better. and maybe we should have PK and FK etc. in the table load?
+
+season should be a CLI with default? or a yaml?
+
+models
+- aren't we just making col names all caps in python and then back to all lowercase in stg_player_game_logs?
+
+
+marts
+- what's usage per game? where did that formula come formula
