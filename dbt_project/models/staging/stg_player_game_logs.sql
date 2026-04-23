@@ -1,43 +1,51 @@
 -- models/staging/stg_player_game_logs.sql
 -- Clean and type-cast the raw player game log data
+-- Incremental: appends new games only, identified by game_id + player_id
+{{ config(materialized="incremental", unique_key=["game_id", "player_id"]) }}
 
-with source as (
-    select * from {{ source('raw', 'RAW_PLAYER_GAME_LOGS') }}
-),
+with
+    source as (
+        select *
+        from {{ source("raw", "RAW_PLAYER_GAME_LOGS") }}
 
-renamed as (
-    select
-        GAME_ID                             as game_id,
-        PLAYER_ID                           as player_id,
-        PLAYER_NAME                         as player_name,
-        TEAM_ID                             as team_id,
-        TEAM_ABBREVIATION                   as team_abbreviation,
-        to_date(GAME_DATE, 'YYYY-MM-DD')    as game_date,
-    MATCHUP                             as matchup,
-        case when WL = 'W' then true else false end as is_win,
-        -- Minutes as float (stored as "MM:SS" string in some seasons)
-        cast(MIN as float)                  as minutes,
-        cast(PTS as integer)                as points,
-        cast(FGM as integer)                as fgm,
-        cast(FGA as integer)                as fga,
-        cast(FG_PCT as float)               as fg_pct,
-        cast(FG3M as integer)               as fg3m,
-        cast(FG3A as integer)               as fg3a,
-        cast(FG3_PCT as float)              as fg3_pct,
-        cast(FTM as integer)                as ftm,
-        cast(FTA as integer)                as fta,
-        cast(FT_PCT as float)               as ft_pct,
-        cast(OREB as integer)               as offensive_rebounds,
-        cast(DREB as integer)               as defensive_rebounds,
-        cast(REB as integer)                as rebounds,
-        cast(AST as integer)                as assists,
-        cast(STL as integer)                as steals,
-        cast(BLK as integer)                as blocks,
-        cast(TOV as integer)                as turnovers,
-        cast(PF as integer)                 as personal_fouls,
-        cast(PLUS_MINUS as float)           as plus_minus,
-        cast(NBA_FANTASY_PTS as float)      as fantasy_points
-    from source
-)
+        {% if is_incremental() %}
+            where to_date(game_date) > (select max(game_date) from {{ this }})
+        {% endif %}
+    ),
 
-select * from renamed
+    renamed as (
+        select
+            game_id as game_id,
+            player_id as player_id,
+            player_name as player_name,
+            team_id as team_id,
+            team_abbreviation as team_abbreviation,
+            to_date(game_date) as game_date,
+            matchup as matchup,
+            case when wl = 'W' then true else false end as is_win,
+            cast(min as float) as minutes,
+            cast(pts as integer) as points,
+            cast(fgm as integer) as fgm,
+            cast(fga as integer) as fga,
+            cast(fg_pct as float) as fg_pct,
+            cast(fg3m as integer) as fg3m,
+            cast(fg3a as integer) as fg3a,
+            cast(fg3_pct as float) as fg3_pct,
+            cast(ftm as integer) as ftm,
+            cast(fta as integer) as fta,
+            cast(ft_pct as float) as ft_pct,
+            cast(oreb as integer) as offensive_rebounds,
+            cast(dreb as integer) as defensive_rebounds,
+            cast(reb as integer) as rebounds,
+            cast(ast as integer) as assists,
+            cast(stl as integer) as steals,
+            cast(blk as integer) as blocks,
+            cast(tov as integer) as turnovers,
+            cast(pf as integer) as personal_fouls,
+            cast(plus_minus as float) as plus_minus,
+            cast(nba_fantasy_pts as float) as fantasy_points
+        from source
+    )
+
+select *
+from renamed

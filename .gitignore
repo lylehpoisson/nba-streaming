@@ -14,6 +14,7 @@ dbt_project/target/
 dbt_project/logs/
 dbt_project/.user.yml
 dbt_project/profiles.yml
+logs/*
 
 # dagster runtime (created when DAGSTER_HOME is not set)
 .tmp_dagster_home_*/
