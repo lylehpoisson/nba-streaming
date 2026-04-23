@@ -1,8 +1,19 @@
+# credentials
 .env
+
+# python
 __pycache__/
 *.pyc
+*.pyo
 .venv/
+*.egg-info/
+.pytest_cache/
+
+# dbt
 dbt_project/target/
 dbt_project/logs/
 dbt_project/.user.yml
 dbt_project/profiles.yml
+
+# dagster runtime (created when DAGSTER_HOME is not set)
+.tmp_dagster_home_*/

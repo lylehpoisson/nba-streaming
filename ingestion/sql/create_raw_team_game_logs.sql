@@ -1,14 +1,13 @@
 CREATE OR REPLACE TABLE NBA_DB.RAW.RAW_TEAM_GAME_LOGS (
     SEASON_ID           VARCHAR(10)    NOT NULL COMMENT 'Season ID as returned by nba_api e.g. 22024 (PK component)',
     TEAM_ID             INTEGER        NOT NULL COMMENT 'Team identifier (FK -> RAW_TEAMS.ID, PK component)',
-    GAME_ID             VARCHAR(20)    NOT NULL COMMENT 'Unique game identifier (PK component)',
     TEAM_ABBREVIATION   VARCHAR(5)               COMMENT '3-letter team abbreviation e.g. LAL',
     TEAM_NAME           VARCHAR(100)             COMMENT 'Full team name',
+    GAME_ID             VARCHAR(20)    NOT NULL COMMENT 'Unique game identifier (PK component)',
     GAME_DATE           VARCHAR(20)              COMMENT 'Game date as string YYYY-MM-DD',
     MATCHUP             VARCHAR(20)              COMMENT 'Matchup string e.g. LAL vs. BOS or LAL @ BOS',
     WL                  VARCHAR(1)               COMMENT 'Win or loss: W or L',
     MIN                 FLOAT                    COMMENT 'Minutes played',
-    PTS                 INTEGER                  COMMENT 'Points scored',
     FGM                 INTEGER                  COMMENT 'Field goals made',
     FGA                 INTEGER                  COMMENT 'Field goals attempted',
     FG_PCT              FLOAT                    COMMENT 'Field goal percentage',
@@ -26,7 +25,8 @@ CREATE OR REPLACE TABLE NBA_DB.RAW.RAW_TEAM_GAME_LOGS (
     BLK                 INTEGER                  COMMENT 'Blocks',
     TOV                 INTEGER                  COMMENT 'Turnovers',
     PF                  INTEGER                  COMMENT 'Personal fouls',
+    PTS                 INTEGER                  COMMENT 'Points scored',
     PLUS_MINUS          FLOAT                    COMMENT 'Plus/minus for the game',
     CONSTRAINT PK_RAW_TEAM_GAME_LOGS PRIMARY KEY (SEASON_ID, TEAM_ID, GAME_ID)
 )
-COMMENT = 'Raw team box score data per game, loaded from nba_api LeagueGameLog. One row per team per game. VIDEO_AVAILABLE excluded.';
+COMMENT = 'Raw team box score data per game, loaded from nba_api LeagueGameLog. One row per team per game.';

@@ -4,7 +4,6 @@ CREATE OR REPLACE TABLE NBA_DB.RAW.RAW_PLAYER_GAME_LOGS (
     PLAYER_NAME         VARCHAR(100)             COMMENT 'Full player name',
     TEAM_ID             INTEGER                  COMMENT 'Team identifier (FK -> RAW_TEAMS.ID)',
     TEAM_ABBREVIATION   VARCHAR(5)               COMMENT '3-letter team abbreviation e.g. LAL',
-    SEASON              VARCHAR(10)    NOT NULL COMMENT 'Season in YYYY-YY format e.g. 2024-25',
     GAME_DATE           VARCHAR(20)              COMMENT 'Game date as string YYYY-MM-DD',
     MATCHUP             VARCHAR(20)              COMMENT 'Matchup string e.g. LAL vs. BOS or LAL @ BOS',
     WL                  VARCHAR(1)               COMMENT 'Win or loss: W or L',

@@ -4,15 +4,17 @@ Pulls game logs + player stats from nba_api and loads raw tables into Snowflake.
 Invoked via cli.py -- do not run directly.
 """
 
-import time
+import csv
 import os
+import tempfile
+import time
 from pathlib import Path
+
 import pandas as pd
 import snowflake.connector
-from snowflake.connector.pandas_tools import write_pandas
+from dotenv import load_dotenv
 from nba_api.stats.endpoints import leaguegamelog, playergamelogs
 from nba_api.stats.static import teams
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -29,7 +31,6 @@ PLAYER_LOG_KEEP_COLS = [
     "PLAYER_NAME",
     "TEAM_ID",
     "TEAM_ABBREVIATION",
-    "SEASON",
     "GAME_DATE",
     "MATCHUP",
     "WL",
@@ -113,19 +114,46 @@ def setup_snowflake(conn):
 
 
 def load_df(conn, df: pd.DataFrame, table: str):
-    """Uppercase columns for Snowflake compatibility and load via write_pandas."""
-    # nba_api returns mixed-case column names; Snowflake stores unquoted identifiers
-    # as uppercase, so we normalise here to avoid case-mismatch errors on load.
+    """
+    Load a DataFrame into Snowflake via an internal stage + COPY INTO.
+    More reliable than write_pandas -- gives explicit control over
+    compression, error handling, and stage lifecycle.
+    """
     df.columns = [c.upper() for c in df.columns]
-    success, nchunks, nrows, _ = write_pandas(
-        conn,
-        df,
-        table_name=table,
-        database="NBA_DB",
-        schema="RAW",
-        overwrite=True,
-        quote_identifiers=False,
+
+    stage = f"nba_stage_{table.lower()}"
+    cur = conn.cursor()
+
+    # Create a temporary internal stage
+    cur.execute(
+        f"CREATE OR REPLACE TEMPORARY STAGE {stage} FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY = '\"' NULL_IF = ('') SKIP_HEADER = 1 ENCODING = 'UTF-8')"
     )
+
+    # Write DataFrame to a temp CSV and PUT it to the stage
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".csv", delete=False, newline="", encoding="utf-8"
+    ) as f:
+        df.to_csv(f, index=False, quoting=csv.QUOTE_NONNUMERIC)
+        tmp_path = f.name
+
+    cur.execute(f"PUT file://{tmp_path} @{stage} AUTO_COMPRESS=TRUE OVERWRITE=TRUE")
+
+    # Truncate and load
+    cur.execute(f"TRUNCATE TABLE NBA_DB.RAW.{table}")
+    cur.execute(f"""
+        COPY INTO NBA_DB.RAW.{table}
+        FROM @{stage}
+        FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY = '"' NULL_IF = ('') SKIP_HEADER = 1)
+        ON_ERROR = 'ABORT_STATEMENT'
+        PURGE = TRUE
+    """)
+
+    # Get row count from COPY INTO result
+    results = cur.fetchall()
+    nrows = sum(r[3] for r in results)  # rows_loaded column
+
+    cur.close()
+    Path(tmp_path).unlink(missing_ok=True)  # clean up temp file
     print(f"  {table}: {nrows} rows loaded")
     return nrows
 
@@ -163,11 +191,8 @@ def extract_player_game_logs(season: str) -> pd.DataFrame:
         timeout=60,
     )
     df = pl.get_data_frames()[0]
-    drop = [c for c in PLAYER_LOG_DROP_COLS if c in df.columns]
-    df = df.drop(columns=drop)
-    df = df.rename(columns={"SEASON_YEAR": "SEASON"})
     df = df[[c for c in PLAYER_LOG_KEEP_COLS if c in df.columns]]
-    print(f"  -> {len(df)} player-game rows ({len(drop)} rank/noise columns dropped)")
+    print(f"  -> {len(df)} player-game rows")
     return df
 
 

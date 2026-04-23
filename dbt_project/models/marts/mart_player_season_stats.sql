@@ -1,5 +1,5 @@
 -- models/marts/mart_player_season_stats.sql
--- Aggregated player stats for the season — supports player rankings / comparisons
+-- Aggregated player stats for the season -- supports player rankings / comparisons
 
 with game_logs as (
     select * from {{ ref('stg_player_game_logs') }}
@@ -11,7 +11,6 @@ aggregated as (
         player_name,
         team_id,
         team_abbreviation,
-        season,
         count(*)                                    as games_played,
         round(avg(minutes), 1)                      as avg_minutes,
         -- Per-game averages
@@ -26,7 +25,7 @@ aggregated as (
         round(avg(fg_pct), 3)                       as fg_pct,
         round(avg(fg3_pct), 3)                      as fg3_pct,
         round(avg(ft_pct), 3)                       as ft_pct,
-        -- True shooting % approximation: PTS / (2 * (FGA + 0.44 * FTA))
+        -- True shooting %: PTS / (2 * (FGA + 0.44 * FTA))
         round(
             sum(points)::float / nullif(
                 2 * (sum(fga) + 0.44 * sum(fta)),
@@ -34,34 +33,28 @@ aggregated as (
             ),
             3
         )                                           as true_shooting_pct,
-        -- Usage proxy: how many possessions does this player use
+        -- Possession actions per game (usage proxy)
         round(
             (sum(fga) + 0.44 * sum(fta) + sum(turnovers))::float
             / nullif(count(*), 0),
             1
-        )                                           as usage_per_game,
+        )                                           as possession_actions_per_game,
         -- Win stats
         sum(case when is_win then 1 else 0 end)     as wins,
         round(avg(fantasy_points), 1)               as avg_fantasy_pts
     from game_logs
     where minutes > 0   -- exclude DNPs
-    group by 1, 2, 3, 4, 5
+    group by 1, 2, 3, 4
 )
 
 select
     *,
-    -- Rankings within season (all players with >= 10 games)
+    -- Rankings (players with >= 10 games only)
     case when games_played >= 10 then
-        rank() over (
-            partition by season
-            order by ppg desc
-        )
+        rank() over (order by ppg desc)
     end                                             as ppg_rank,
     case when games_played >= 10 then
-        rank() over (
-            partition by season
-            order by true_shooting_pct desc
-        )
+        rank() over (order by true_shooting_pct desc)
     end                                             as ts_pct_rank
 from aggregated
 order by ppg desc

@@ -12,9 +12,8 @@ renamed as (
         PLAYER_NAME                         as player_name,
         TEAM_ID                             as team_id,
         TEAM_ABBREVIATION                   as team_abbreviation,
-        SEASON                              as season,
         to_date(GAME_DATE, 'YYYY-MM-DD')    as game_date,
-        MATCHUP                             as matchup,
+    MATCHUP                             as matchup,
         case when WL = 'W' then true else false end as is_win,
         -- Minutes as float (stored as "MM:SS" string in some seasons)
         cast(MIN as float)                  as minutes,

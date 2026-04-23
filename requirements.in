@@ -1,7 +1,11 @@
-nba_api                          # NBA stats data source
-snowflake-connector-python[pandas]  # Snowflake + write_pandas support
-python-dotenv                    # load credentials from .env
-dbt-snowflake                    # dbt adapter for Snowflake
-pip-tools                        # dependency management (compile this file with pip-compile)
-dotenv                           # read credentials
-click                            # CLI
+nba_api                          # NBA stats API client (no key required)
+snowflake-connector-python[pandas]  # Snowflake connector + write_pandas for bulk loads
+python-dotenv                    # loads .env file into environment variables
+dbt-snowflake                    # dbt core + Snowflake adapter
+pip-tools                        # compile requirements.in -> requirements.txt with pip-compile
+click                            # CLI framework used by ingestion/cli.py
+dagster                          # orchestration framework
+dagster-dbt                      # dbt integration -- wraps dbt models as Dagster assets
+dagster-snowflake                # Snowflake resource and IO manager for Dagster
+dagster-webserver                # Dagster UI (dagster dev)
+dagster-dg                       # Dagster CLI for scaffolding and project management
