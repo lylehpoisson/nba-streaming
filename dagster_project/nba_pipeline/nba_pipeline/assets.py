@@ -1,14 +1,8 @@
-import sys
-from pathlib import Path
-
-# Allow importing from the ingestion folder
-sys.path.append(str(Path(__file__).parent.parent.parent.parent / "ingestion"))
-
 from dagster import asset, OpExecutionContext, AssetKey
+from pipeline import load as ingest
+from pipeline import rag
 
-import load_to_snowflake as ingest
-
-SEASON = "2024-25"
+SEASON = "2025-26"
 
 
 @asset(key=AssetKey(["raw", "RAW_TEAMS"]), group_name="raw", compute_kind="python")
@@ -46,3 +40,18 @@ def raw_player_game_logs(context: OpExecutionContext):
     nrows = ingest.load_df(conn, df, "RAW_PLAYER_GAME_LOGS")
     conn.close()
     context.log.info(f"Loaded {nrows} player-game rows")
+
+
+@asset(
+    key=AssetKey(["embeddings"]),
+    group_name="rag",
+    compute_kind="python",
+    deps=[
+        AssetKey(["marts", "mart_team_season_stats"]),
+        AssetKey(["marts", "mart_player_season_stats"]),
+    ],
+)
+def embeddings(context: OpExecutionContext):
+    """Generate and load vector embeddings for all teams and players."""
+    n = rag.embed_all()
+    context.log.info(f"Loaded {n} embeddings")

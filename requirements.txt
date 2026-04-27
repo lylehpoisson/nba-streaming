@@ -12,15 +12,18 @@ agate==1.9.1
     #   dbt-snowflake
 alembic==1.18.4
     # via dagster
-annotated-doc==0.0.4
-    # via typer
 annotated-types==0.7.0
     # via pydantic
+anthropic==0.97.0
+    # via -r requirements.in
 antlr4-python3-runtime==4.13.2
     # via dagster
 anyio==4.13.0
     # via
+    #   anthropic
+    #   google-genai
     #   gql
+    #   httpx
     #   starlette
     #   watchfiles
 asn1crypto==1.5.1
@@ -35,18 +38,20 @@ backoff==2.2.1
     # via gql
 black==25.12.0
     # via shandy-sqlfmt
-boto3==1.42.90
+boto3==1.42.94
     # via snowflake-connector-python
-botocore==1.42.90
+botocore==1.42.94
     # via
     #   boto3
     #   s3transfer
     #   snowflake-connector-python
-build==1.4.3
+build==1.4.4
     # via pip-tools
 certifi==2025.1.31
     # via
     #   dbt-snowflake
+    #   httpcore
+    #   httpx
     #   requests
     #   snowflake-connector-python
     #   snowflake-core
@@ -56,7 +61,7 @@ charset-normalizer==3.4.7
     # via
     #   requests
     #   snowflake-connector-python
-click==8.3.2
+click==8.3.3
     # via
     #   -r requirements.in
     #   black
@@ -82,6 +87,7 @@ coloredlogs==14.0
     # via dagster
 cryptography==46.0.7
     # via
+    #   google-auth
     #   pyopenssl
     #   snowflake-connector-python
 daff==1.4.2
@@ -95,7 +101,7 @@ dagster==1.13.1
     #   dagster-webserver
 dagster-dbt==0.29.1
     # via -r requirements.in
-dagster-dg==0.1.6
+dagster-dg==0.2.2
     # via -r requirements.in
 dagster-graphql==1.13.1
     # via dagster-webserver
@@ -122,7 +128,7 @@ dbt-core==1.11.8
     #   dbt-snowflake
 dbt-extractor==0.6.0
     # via dbt-core
-dbt-protos==1.0.443
+dbt-protos==1.0.474
     # via
     #   dbt-adapters
     #   dbt-common
@@ -133,9 +139,15 @@ dbt-snowflake==1.11.4
     # via -r requirements.in
 deepdiff==8.6.2
     # via dbt-common
+distro==1.9.0
+    # via
+    #   anthropic
+    #   google-genai
 docstring-parser==0.18.0
-    # via dagster
-filelock==3.28.0
+    # via
+    #   anthropic
+    #   dagster
+filelock==3.29.0
     # via
     #   dagster
     #   snowflake-connector-python
@@ -143,8 +155,12 @@ fsspec==2026.3.0
     # via universal-pathlib
 gitdb==4.0.12
     # via gitpython
-gitpython==3.1.46
+gitpython==3.1.47
     # via dagster-dbt
+google-auth[requests]==2.49.2
+    # via google-genai
+google-genai==1.73.1
+    # via -r requirements.in
 gql[requests]==4.0.0
     # via dagster-graphql
 graphene==3.4.3
@@ -165,14 +181,23 @@ grpcio==1.80.0
 grpcio-health-checking==1.80.0
     # via dagster
 h11==0.16.0
-    # via uvicorn
+    # via
+    #   httpcore
+    #   uvicorn
+httpcore==1.0.9
+    # via httpx
 httptools==0.7.1
     # via uvicorn
+httpx==0.28.1
+    # via
+    #   anthropic
+    #   google-genai
 humanfriendly==10.0
     # via coloredlogs
-idna==3.11
+idna==3.13
     # via
     #   anyio
+    #   httpx
     #   requests
     #   snowflake-connector-python
     #   yarl
@@ -197,12 +222,15 @@ jinja2==3.1.6
     #   dbt-core
     #   dbt-semantic-interfaces
     #   shandy-sqlfmt
+jiter==0.14.0
+    # via anthropic
 jmespath==1.1.0
     # via
     #   boto3
     #   botocore
 jsonschema==4.26.0
     # via
+    #   dagster-dg
     #   dbt-common
     #   dbt-core
     #   dbt-semantic-interfaces
@@ -297,17 +325,23 @@ protobuf==6.33.6
     #   snowflake-snowpark-python
 psutil==7.2.2
     # via dagster
-pyarrow==23.0.1
+pyarrow==24.0.0
     # via snowflake-connector-python
+pyasn1==0.6.3
+    # via pyasn1-modules
+pyasn1-modules==0.4.2
+    # via google-auth
 pycparser==3.0
     # via cffi
-pydantic==2.13.2
+pydantic==2.13.3
     # via
+    #   anthropic
     #   dagster-shared
     #   dbt-core
     #   dbt-semantic-interfaces
+    #   google-genai
     #   snowflake-core
-pydantic-core==2.46.2
+pydantic-core==2.46.3
     # via pydantic
 pygments==2.20.0
     # via rich
@@ -374,6 +408,8 @@ requests==2.33.1
     #   dagster-graphql
     #   dbt-common
     #   dbt-core
+    #   google-auth
+    #   google-genai
     #   gql
     #   nba-api
     #   requests-toolbelt
@@ -386,12 +422,13 @@ rich==15.0.0
     # via
     #   dagster
     #   dagster-dbt
+    #   dagster-dg
     #   typer
 rpds-py==0.30.0
     # via
     #   jsonschema
     #   referencing
-s3transfer==0.16.0
+s3transfer==0.16.1
     # via boto3
 shandy-sqlfmt[jinjafmt]==0.29.0
     # via -r requirements.in
@@ -403,6 +440,10 @@ six==1.17.0
     #   python-dateutil
 smmap==5.0.3
     # via gitdb
+sniffio==1.3.1
+    # via
+    #   anthropic
+    #   google-genai
 snowflake-connector-python[pandas,secure-local-storage]==4.4.0
     # via
     #   -r requirements.in
@@ -436,14 +477,17 @@ structlog==25.5.0
     # via dagster
 tabulate==0.10.0
     # via dagster
+tenacity==9.1.4
+    # via google-genai
+termcolor==3.3.0
+    # via yaspin
 text-unidecode==1.3
     # via python-slugify
 tomli==2.4.1
-    # via
-    #   dagster
-    #   dagster-dg
+    # via dagster
 tomlkit==0.14.0
     # via
+    #   dagster-dg
     #   dagster-shared
     #   snowflake-connector-python
 toposort==1.10
@@ -452,11 +496,14 @@ tqdm==4.67.3
     # via
     #   dagster
     #   shandy-sqlfmt
-typer==0.24.1
-    # via dagster-dbt
+typer==0.15.1
+    # via
+    #   dagster-dbt
+    #   dagster-dg
 typing-extensions==4.15.0
     # via
     #   alembic
+    #   anthropic
     #   anyio
     #   dagster-dg
     #   dagster-shared
@@ -464,6 +511,7 @@ typing-extensions==4.15.0
     #   dbt-common
     #   dbt-core
     #   dbt-semantic-interfaces
+    #   google-genai
     #   graphene
     #   grpcio
     #   mashumaro
@@ -476,6 +524,7 @@ typing-extensions==4.15.0
     #   snowplow-tracker
     #   sqlalchemy
     #   starlette
+    #   typer
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
@@ -494,20 +543,26 @@ urllib3==2.6.3
     #   botocore
     #   requests
     #   snowflake-core
-uvicorn[standard]==0.44.0
+uvicorn[standard]==0.46.0
     # via dagster-webserver
 watchdog==6.0.0
-    # via dagster
+    # via
+    #   dagster
+    #   dagster-dg
 watchfiles==1.1.1
     # via uvicorn
 websockets==16.0
-    # via uvicorn
-wheel==0.46.3
+    # via
+    #   google-genai
+    #   uvicorn
+wheel==0.47.0
     # via
     #   pip-tools
     #   snowflake-snowpark-python
 yarl==1.23.0
     # via gql
+yaspin==3.4.0
+    # via dagster-dg
 zipp==3.23.1
     # via importlib-metadata
 

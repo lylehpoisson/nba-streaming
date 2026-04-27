@@ -10,3 +10,5 @@ dagster-snowflake                   # Snowflake resource and IO manager for Dags
 dagster-webserver                   # Dagster UI (dagster dev)
 dagster-dg                          # Dagster CLI for scaffolding and project management
 shandy-sqlfmt[jinjafmt]             # SQL formatter for dbt models
+google-genai                        # Google embedding model for RAG layer (new SDK, supports protobuf>=6)
+anthropic                           # For Querying

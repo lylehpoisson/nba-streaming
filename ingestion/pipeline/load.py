@@ -21,7 +21,8 @@ load_dotenv()
 # -- Constants ----------------------------------------------------------------
 
 DELAY = 0.6  # seconds between API calls -- be polite to stats.nba.com
-SQL_DIR = Path(__file__).parent / "sql"
+SQL_DIR = Path(__file__).parent.parent / "sql"
+
 
 # Explicit allowlist of columns to keep for player game logs -- matches RAW_PLAYER_GAME_LOGS schema.
 # Using an allowlist rather than a drop-list guards against future API columns causing load errors.

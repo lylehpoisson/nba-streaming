@@ -1,6 +1,11 @@
 from dagster import Definitions, ScheduleDefinition, define_asset_job
 from dagster_dbt import DbtCliResource
-from nba_pipeline.assets import raw_teams, raw_team_game_logs, raw_player_game_logs
+from nba_pipeline.assets import (
+    raw_teams,
+    raw_team_game_logs,
+    raw_player_game_logs,
+    embeddings,
+)
 from nba_pipeline.dbt_assets import nba_dbt_assets, DBT_PROJECT_PATH
 
 nba_pipeline_job = define_asset_job(
@@ -24,6 +29,7 @@ defs = Definitions(
         raw_team_game_logs,
         raw_player_game_logs,
         nba_dbt_assets,
+        embeddings,
     ],
     jobs=[nba_pipeline_job],
     schedules=[nightly_schedule],

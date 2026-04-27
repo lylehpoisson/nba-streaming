@@ -81,7 +81,7 @@ DBT_SCHEMA=DBT_DEV
 
 ```bash
 cd ingestion
-python cli.py load                    # defaults to 2024-25
+python cli.py load                    # defaults to 2025-26
 python cli.py load --season 2023-24   # any prior season
 ```
 
@@ -145,5 +145,5 @@ pip-compile requirements.in
 
 - Incremental dbt models — append new games only instead of full refresh
 - `mart_rolling_team_form` — last-10-games rolling window using Snowflake window functions
-- Multi-season backfill command (`cli.py backfill --start 2020-21 --end 2024-25`)
+- Multi-season backfill command (`cli.py backfill --start 2020-21 --end 2025-26`)
 - RAG layer — player/team embeddings in a vector database for natural language queries
